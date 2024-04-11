@@ -2,13 +2,20 @@ package ru.maxima.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.maxima.dto.BookDTO;
+import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
 import ru.maxima.model.Person;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/books")
@@ -24,16 +31,15 @@ public class BooksController {
     }
 
     @GetMapping
-    public String showAllBooks(Model model) {
-        model.addAttribute("books", booksService.findAllBooks());
-        return "view-with-all-books";
+    public ResponseEntity<List<BookDTO>> showAllBooks() {
+        return ResponseEntity.ok(booksService.findAllBooks());
     }
 
     @PostMapping("/{id}/assign")
-    public String assignABook(@PathVariable("id") Long id,
-                              @ModelAttribute("person") Person person) {
+    public ResponseEntity assignABook(@PathVariable("id") Long id,
+                              @RequestBody PersonDTO person) {
         booksService.assignABook(id, person);
-        return "redirect:/books";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

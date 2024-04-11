@@ -1,13 +1,17 @@
 package ru.maxima.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.maxima.dto.BookDTO;
+import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,21 +21,28 @@ public class BooksService {
 
     private final PeopleRepository peopleRepository;
     private final BooksRepository booksRepository;
+    private final ModelMapper mapper;
 
     @Autowired
-    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository) {
+    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
         this.booksRepository = booksRepository;
+        this.mapper = mapper;
     }
 
-    public List<Book> findAllBooks() {
-        return booksRepository.findAll();
+    public List<BookDTO> findAllBooks() {
+        List<Book> books = booksRepository.findAll();
+        List<BookDTO> booksDTO = new ArrayList<>();
+        for (Book book : books) {
+            booksDTO.add(mapper.map(book, BookDTO.class));
+        };
+        return booksDTO;
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
-    public Book findOneBook(Long id) {
+    public BookDTO findOneBook(Long id) {
         Optional<Book> foundBook = booksRepository.findById(id);
-        return foundBook.orElse(null);
+        return mapper.map(foundBook, BookDTO.class);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
@@ -58,7 +69,7 @@ public class BooksService {
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
-    public void assignABook(Long bookId, Person person) {
+    public void assignABook(Long bookId, PersonDTO person) {
         Book book = booksRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + bookId));
         if (peopleRepository.findById(person.getId()).isEmpty()) {

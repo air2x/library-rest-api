@@ -7,9 +7,12 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.maxima.model.enums.Role;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,7 +46,10 @@ public class Person {
     @Column(name = "password")
     private String password;
 
-    @NotEmpty
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Book> books;
+
     @Column(name = "role")
     private Role role;
 

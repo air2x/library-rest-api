@@ -1,14 +1,19 @@
 package ru.maxima.controllers;
 
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Person;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/people")
@@ -16,61 +21,64 @@ public class PeopleController {
 
     private final PeopleService peopleService;
     private final BooksService booksService;
+    private final ModelMapper mapper;
 
     @Autowired
-    public PeopleController(PeopleService peopleService, BooksService booksService) {
+    public PeopleController(PeopleService peopleService, BooksService booksService, ModelMapper mapper) {
         this.peopleService = peopleService;
         this.booksService = booksService;
+        this.mapper = mapper;
     }
 
     @GetMapping
-    public String showAllPeople(Model model) {
-        model.addAttribute("people", peopleService.findAllPeople());
-        return "view-with-all-people";
+    public ResponseEntity<List<PersonDTO>> showAllPeople() {
+        return ResponseEntity.ok(peopleService.findAllPeople());
     }
 
     @GetMapping("/{id}")
-    public String showPerson(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("person", peopleService.findOnePerson(id));
-        return "view-with-person-by-id";
+    public PersonDTO showPerson(@PathVariable("id") Long id) {
+        Person person = peopleService.findOnePerson(id);
+        return mapper.map(person, PersonDTO.class);
     }
 
+
     @GetMapping("/new")
-    public String addNewPerson(Model model) {
-        model.addAttribute("person", new Person());
-        return "view-to-create-new-person";
+    public ResponseEntity<HttpStatus> addNewPerson(@RequestBody PersonDTO personDTO) {
+        peopleService.savePerson(personDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping()
-    public String createPerson(@ModelAttribute("person") @Valid Person person,
+    public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonDTO personDTO,
                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "view-to-create-new-person";
+            throw new RuntimeException("Error create person");
         }
-        peopleService.savePerson(person);
-        return "redirect:/people";
+        peopleService.savePerson(personDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/edit")
-    public String editPerson(Model model, @PathVariable("id") int id) {
-        model.addAttribute("person", peopleService.findOnePerson(id));
-        return "view-to-edit-person";
-    }
+//    @GetMapping("/{id}/edit")
+//    public ResponseEntity<HttpStatus> editPerson(@PathVariable("id") Long id,
+//                             @RequestBody PersonDTO personDTO) {
+//        peopleService.updatePerson(id, personDTO);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
     @PostMapping("/{id}")
-    public String updatePerson(@ModelAttribute("person") @Valid Person person,
+    public ResponseEntity<HttpStatus> updatePerson(@RequestBody @Valid PersonDTO personDTO,
                                BindingResult bindingResult,
-                               @PathVariable("id") int id) {
+                               @PathVariable("id") Long id) {
         if (bindingResult.hasErrors()) {
-            return "view-to-edit-person";
+            throw new RuntimeException("Error update person");
         }
-        peopleService.updatePerson(id, person);
-        return "redirect:/people";
+        peopleService.updatePerson(id, personDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public String deletePerson(@PathVariable("id") int id) {
+    public ResponseEntity<HttpStatus> deletePerson(@PathVariable("id") Long id) {
         peopleService.deletePerson(id);
-        return "redirect:/people";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -1,12 +1,17 @@
 package ru.maxima.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.PeopleRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,15 +20,25 @@ import java.util.Optional;
 public class PeopleService {
 
     private final PeopleRepository peopleRepository;
+    private final ModelMapper mapper;
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository) {
+    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
+        this.mapper = mapper;
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
-    public List<Person> findAllPeople() {
-        return peopleRepository.findAll();
+    public List<PersonDTO> findAllPeople() {
+        List<Person> people = peopleRepository.findAll();
+        List<PersonDTO> peopleDTO = new ArrayList<>();
+        for (Person person : people) {
+            if (person.getRemovedAt() != null) {
+                continue;
+            }
+            peopleDTO.add(mapper.map(person, PersonDTO.class));
+        }
+        return peopleDTO;
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
@@ -33,22 +48,28 @@ public class PeopleService {
     }
 
     @Transactional
-    public void savePerson(Person person) {
+    public void savePerson(PersonDTO personDTO) {
+        Person person = mapper.map(personDTO, Person.class);
+//        person.setCreatedPerson();
+        person.setCreatedAt(LocalDateTime.now());
         peopleRepository.save(person);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
-    public void updatePerson(Long id, Person updatePerson) {
-        updatePerson.setId(id);
-        updatePerson.setYearOfBirth(updatePerson.getYearOfBirth());
-        updatePerson.setFullName(updatePerson.getFullName());
-        peopleRepository.save(updatePerson);
+    public void updatePerson(Long id, PersonDTO updatePerson) {
+        Person person = findOnePerson(id);
+        person.setAge(updatePerson.getAge());
+        person.setName(updatePerson.getName());
+        person.setEmail(updatePerson.getEmail());
+        peopleRepository.save(person);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void deletePerson(Long id) {
-        peopleRepository.deleteById(id);
+        Person person = findOnePerson(id);
+//        person.setRemovedPerson();
+        person.setRemovedAt(LocalDateTime.now());
     }
 }

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.maxima.libraryspringsecurity.model.Person;
-import ru.maxima.libraryspringsecurity.services.RegistrationService;
-import ru.maxima.libraryspringsecurity.validation.PersonValidator;
+import ru.maxima.model.Person;
+import ru.maxima.services.RegistrationService;
+import ru.maxima.validation.PersonValidator;
 
 @Controller
 @RequestMapping("/auth")

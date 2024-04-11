@@ -32,6 +32,10 @@ public class Book {
     @Column(name = "annotation")
     private String annotation;
 
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "id")
+    private Person owner;
+
     @NotEmpty
     @Column(name = "created_at")
     private LocalDateTime createdAt;
