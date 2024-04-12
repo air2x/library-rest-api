@@ -36,57 +36,54 @@ public class BooksController {
     }
 
     @PostMapping("/{id}/assign")
-    public ResponseEntity assignABook(@PathVariable("id") Long id,
+    public ResponseEntity<HttpStatus> assignABook(@PathVariable("id") Long id,
                               @RequestBody PersonDTO person) {
         booksService.assignABook(id, person);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public String showBook(@PathVariable("id") Long id, Model model,
-                           @ModelAttribute("person") Person person) {
-        model.addAttribute("book", booksService.findOneBook(id));
-        model.addAttribute("people", peopleService.findAllPeople());
-        return "view-with-book-by-id";
+    public BookDTO showBook(@PathVariable("id") Long id) {
+        return booksService.findOneBook(id);
     }
 
     @PostMapping("/{id}/freeTheBook")
-    public String freeTheBook(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpStatus> freeTheBook(@PathVariable("id") Long id) {
         booksService.freeTheBook(id);
-        return "redirect:/books";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/new")
-    public String addNewBook(Model model) {
-        model.addAttribute("book", new Book());
-        return "view-to-create-new-book";
-    }
+//    @GetMapping("/new")
+//    public ResponseEntity<HttpStatus> addNewBook(@RequestBody @Valid BookDTO bookDTO) {
+//        booksService.saveBook(bookDTO);
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
 
     @PostMapping()
-    public String createBook(@ModelAttribute("book") @Valid Book book,
+    public ResponseEntity<HttpStatus> createBook(@RequestBody @Valid BookDTO bookDTO,
                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "view-to-create-new-book";
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        booksService.saveBook(book);
-        return "redirect:/books";
+        booksService.saveBook(bookDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/edit")
-    public String editBook(Model model, @PathVariable("id") Long id) {
-        model.addAttribute("book", booksService.findOneBook(id));
-        return "view-to-edit-book";
-    }
+//    @GetMapping("/{id}/edit")
+//    public String editBook(Model model, @PathVariable("id") Long id) {
+//        model.addAttribute("book", booksService.findOneBook(id));
+//        return "view-to-edit-book";
+//    }
 
     @PostMapping("/{id}")
-    public String updateBook(@ModelAttribute("book") @Valid Book book,
+    public ResponseEntity<HttpStatus> updateBook(@RequestBody @Valid BookDTO bookDTO,
                              BindingResult bindingResult,
                              @PathVariable("id") Long id) {
         if (bindingResult.hasErrors()) {
-            return "view-to-edit-book";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        booksService.updateBook(id, book);
-        return "redirect:/books";
+        booksService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

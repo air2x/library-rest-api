@@ -11,6 +11,8 @@ import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
 
+import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +23,15 @@ public class BooksService {
 
     private final PeopleRepository peopleRepository;
     private final BooksRepository booksRepository;
+
+    private final PeopleService peopleService;
     private final ModelMapper mapper;
 
     @Autowired
-    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository, ModelMapper mapper) {
+    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository, PeopleService peopleService, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
         this.booksRepository = booksRepository;
+        this.peopleService = peopleService;
         this.mapper = mapper;
     }
 
@@ -47,13 +52,17 @@ public class BooksService {
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
-    public void saveBook(Book book) {
+    public void saveBook(BookDTO bookDTO) {
+        Book book = mapper.map(bookDTO, Book.class);
+        book.setCreatedAt(LocalDateTime.now());
+//        book.setCreatedPerson();
         booksRepository.save(book);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
-    public void updateBook(Long id, Book updateBook) {
+    public void updateBook(Long id, BookDTO updateBook) {
+
         updateBook.setId(id);
         updateBook.setNameOfBook(updateBook.getNameOfBook());
         updateBook.setAuthorOfBook(updateBook.getAuthorOfBook());
@@ -69,17 +78,18 @@ public class BooksService {
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
-    public void assignABook(Long bookId, PersonDTO person) {
+    public void assignABook(Long bookId, PersonDTO personDTO) {
+        Optional<Person> person = peopleRepository.findByEmail(personDTO.getEmail());
         Book book = booksRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + bookId));
-        if (peopleRepository.findById(person.getId()).isEmpty()) {
-            peopleRepository.save(person);
+        if (person.isEmpty()) {
+            peopleService.savePerson(personDTO);
         }
-        book.setOwner(person);
+        book.setOwner(person.orElseThrow());
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.libraryspringsecurity.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void freeTheBook(Long bookId) {
         Book book = booksRepository.findById(bookId)
