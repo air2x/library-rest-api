@@ -45,9 +45,8 @@ public class BooksService {
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
-    public BookDTO findOneBook(Long id) {
-        Optional<Book> foundBook = booksRepository.findById(id);
-        return mapper.map(foundBook, BookDTO.class);
+    public Book findOneBook(Long id) {
+        return booksRepository.findById(id).orElseThrow(null);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
@@ -63,18 +62,20 @@ public class BooksService {
     @Transactional
     public void updateBook(Long id, BookDTO updateBook) {
         Book book = findOneBook(id);
-        updateBook.setId(id);
-        updateBook.setNameOfBook(updateBook.getNameOfBook());
-        updateBook.setAuthorOfBook(updateBook.getAuthorOfBook());
-        updateBook.setYearOfWritingBook(updateBook.getYearOfWritingBook());
-        booksRepository.save(updateBook);
+        book.setName(updateBook.getName());
+        book.setAnnotation(updateBook.getAnnotation());
+        book.setYearOfProduction(updateBook.getYearOfProduction());
+        book.setUpdatedAt(LocalDateTime.now());
+        book.setOwner(updateBook.getOwner());
+        booksRepository.save(book);
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void deleteBook(Long id) {
-        Optional<Book> book = booksRepository.findById(id);
-
+        Book book = findOneBook(id);
+        book.setRemovedAt(LocalDateTime.now());
+//        book.setRemovedPerson();
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")

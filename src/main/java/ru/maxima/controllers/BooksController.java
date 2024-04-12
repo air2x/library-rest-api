@@ -1,17 +1,15 @@
 package ru.maxima.controllers;
 
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
-import ru.maxima.model.Person;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
 
@@ -23,11 +21,13 @@ public class BooksController {
 
     private final BooksService booksService;
     private final PeopleService peopleService;
+    private final ModelMapper mapper;
 
     @Autowired
-    public BooksController(BooksService booksService, PeopleService peopleService) {
+    public BooksController(BooksService booksService, PeopleService peopleService, ModelMapper mapper) {
         this.booksService = booksService;
         this.peopleService = peopleService;
+        this.mapper = mapper;
     }
 
     @GetMapping
@@ -44,7 +44,8 @@ public class BooksController {
 
     @GetMapping("/{id}")
     public BookDTO showBook(@PathVariable("id") Long id) {
-        return booksService.findOneBook(id);
+        Book book = booksService.findOneBook(id);
+        return mapper.map(book, BookDTO.class);
     }
 
     @PostMapping("/{id}/freeTheBook")
