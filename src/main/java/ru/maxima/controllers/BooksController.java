@@ -87,8 +87,8 @@ public class BooksController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBook(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id) {
         booksService.deleteBook(id);
-        return "redirect:/books";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

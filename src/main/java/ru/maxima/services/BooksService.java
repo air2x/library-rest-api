@@ -62,7 +62,7 @@ public class BooksService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void updateBook(Long id, BookDTO updateBook) {
-
+        Book book = findOneBook(id);
         updateBook.setId(id);
         updateBook.setNameOfBook(updateBook.getNameOfBook());
         updateBook.setAuthorOfBook(updateBook.getAuthorOfBook());
@@ -73,7 +73,8 @@ public class BooksService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void deleteBook(Long id) {
-        booksRepository.deleteById(id);
+        Optional<Book> book = booksRepository.findById(id);
+
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
