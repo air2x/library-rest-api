@@ -48,15 +48,15 @@ public class Book {
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
-    @NotEmpty
-    @Column(name = "created_person")
+    @OneToOne
+    @JoinColumn(name = "created_person")
     private Person createdPerson;
 
-    @NotEmpty
-    @Column(name = "removed_person")
+    @OneToOne
+    @JoinColumn(name = "removed_person")
     private Person removedPerson;
 
-    @NotEmpty
-    @Column(name = "updated_person")
+    @OneToOne
+    @JoinColumn(name = "update_person")
     private Person updatedPerson;
 }

@@ -61,11 +61,11 @@ public class Person {
     @Column(name = "removed_at")
     private LocalDateTime removedAt;
 
-    @NotEmpty
-    @Column(name = "created_person")
+    @OneToOne
+    @JoinColumn(name = "created_person")
     private Person createdPerson;
 
-    @NotEmpty
-    @Column(name = "removed_person")
+    @OneToOne
+    @JoinColumn(name = "removed_person")
     private Person removedPerson;
 }

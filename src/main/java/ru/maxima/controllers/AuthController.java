@@ -4,10 +4,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import ru.maxima.dto.PersonRegDTO;
 import ru.maxima.model.Person;
 import ru.maxima.services.RegistrationService;
 import ru.maxima.validation.PersonValidator;
@@ -25,24 +23,24 @@ public class AuthController {
         this.registrationService = registrationService;
     }
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "auth/login";
-    }
+//    @GetMapping("/login")
+//    public String loginPage() {
+//        return "auth/login";
+//    }
 
-    @GetMapping("/registration")
-    public String registrationPage(@ModelAttribute("person") Person person) {
-        return "auth/registration";
-    }
+//    @GetMapping("/registration")
+//    public String registrationPage(@ModelAttribute("person") Person person) {
+//        return "auth/registration";
+//    }
 
     @PostMapping("/registration")
-    public String performRegistration(@ModelAttribute("person") @Valid Person person,
+    public String performRegistration(@RequestBody @Valid PersonRegDTO personRegDTO,
                                       BindingResult bindingResult) {
-        personValidator.validate(person, bindingResult);
+        personValidator.validate(personRegDTO, bindingResult);
         if (bindingResult.hasErrors()) {
-            return "/auth/registration";
+            throw new RuntimeException("Error registration");
         }
-        registrationService.register(person);
+        registrationService.register(personRegDTO);
         return "redirect:/books";
     }
 }

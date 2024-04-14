@@ -10,7 +10,8 @@ import ru.maxima.model.enums.Role;
 
 @Getter
 @Setter
-public class PersonDTO {
+public class PersonRegDTO {
+
 
     @NotEmpty(message = "Имя не должно быть пустым")
     @Size(min = 2, max = 50, message = "Имя должно быть не меньше 2 и не больше 50 символов")
@@ -24,10 +25,10 @@ public class PersonDTO {
 
     @NotEmpty
     private String phoneNumber;
-//
-//    @NotEmpty
-//    private String password;
-//
-//    @NotEmpty
-//    private Role role;
+
+    @NotEmpty
+    private String password;
+
+    @NotEmpty
+    private Role role;
 }
