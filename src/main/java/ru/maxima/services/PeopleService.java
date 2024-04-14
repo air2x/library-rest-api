@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maxima.dto.PersonDTO;
+import ru.maxima.dto.PersonRegDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.PeopleRepository;
 
@@ -48,8 +49,8 @@ public class PeopleService {
     }
 
     @Transactional
-    public void savePerson(PersonDTO personDTO) {
-        Person person = mapper.map(personDTO, Person.class);
+    public void savePerson(PersonRegDTO personRegDTO) {
+        Person person = mapper.map(personRegDTO, Person.class);
 //        person.setCreatedPerson();
         person.setCreatedAt(LocalDateTime.now());
         peopleRepository.save(person);

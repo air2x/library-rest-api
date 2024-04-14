@@ -53,11 +53,9 @@ public class Person {
     @Column(name = "role")
     private Role role;
 
-    @NotEmpty
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @NotEmpty
     @Column(name = "removed_at")
     private LocalDateTime removedAt;
 

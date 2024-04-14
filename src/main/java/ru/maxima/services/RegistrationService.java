@@ -13,13 +13,13 @@ import ru.maxima.repositories.PeopleRepository;
 @Service
 public class RegistrationService {
 
-    private final PeopleRepository peopleRepository;
+    private final PeopleService peopleService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
     @Autowired
-    public RegistrationService(PeopleRepository peopleRepository, PasswordEncoder passwordEncoder, ModelMapper mapper) {
-        this.peopleRepository = peopleRepository;
+    public RegistrationService(PeopleService peopleService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+        this.peopleService = peopleService;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
     }
@@ -27,8 +27,8 @@ public class RegistrationService {
     @Transactional
     public void register(PersonRegDTO personRegDto) {
         Person person = mapper.map(personRegDto, Person.class);
-        person.setPassword(passwordEncoder.encode(personRegDto.getPassword()));
-        person.setRole(Role.ROLE_USER);
-        peopleRepository.save(person);
+        personRegDto.setPassword(passwordEncoder.encode(personRegDto.getPassword()));
+        personRegDto.setRole(Role.ROLE_USER);
+        peopleService.savePerson(personRegDto);
     }
 }

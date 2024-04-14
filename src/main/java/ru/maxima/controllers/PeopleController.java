@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.PersonDTO;
+import ru.maxima.dto.PersonRegDTO;
 import ru.maxima.model.Person;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
@@ -42,19 +43,19 @@ public class PeopleController {
     }
 
 
-    @GetMapping("/new")
-    public ResponseEntity<HttpStatus> addNewPerson(@RequestBody PersonDTO personDTO) {
-        peopleService.savePerson(personDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @GetMapping("/new")
+//    public ResponseEntity<HttpStatus> addNewPerson(@RequestBody PersonRegDTO personRegDTO) {
+//        peopleService.savePerson(personRegDTO);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
     @PostMapping()
-    public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonDTO personDTO,
+    public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,
                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new RuntimeException("Error create person");
         }
-        peopleService.savePerson(personDTO);
+        peopleService.savePerson(personRegDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

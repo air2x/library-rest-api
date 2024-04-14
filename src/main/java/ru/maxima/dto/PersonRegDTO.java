@@ -29,6 +29,5 @@ public class PersonRegDTO {
     @NotEmpty
     private String password;
 
-    @NotEmpty
     private Role role;
 }

@@ -84,9 +84,9 @@ public class BooksService {
         Optional<Person> person = peopleRepository.findByEmail(personDTO.getEmail());
         Book book = booksRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + bookId));
-        if (person.isEmpty()) {
-            peopleService.savePerson(personDTO);
-        }
+//        if (person.isEmpty()) {
+//            peopleService.savePerson(personDTO);
+//        }
         book.setOwner(person.orElseThrow());
         booksRepository.save(book);
     }
