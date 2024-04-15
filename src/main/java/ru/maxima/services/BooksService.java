@@ -22,15 +22,12 @@ public class BooksService {
 
     private final PeopleRepository peopleRepository;
     private final BooksRepository booksRepository;
-
-    private final PeopleService peopleService;
     private final ModelMapper mapper;
 
     @Autowired
-    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository, PeopleService peopleService, ModelMapper mapper) {
+    public BooksService(PeopleRepository peopleRepository, BooksRepository booksRepository, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
         this.booksRepository = booksRepository;
-        this.peopleService = peopleService;
         this.mapper = mapper;
     }
 
@@ -39,7 +36,7 @@ public class BooksService {
         List<BookDTO> booksDTO = new ArrayList<>();
         for (Book book : books) {
             booksDTO.add(mapper.map(book, BookDTO.class));
-        };
+        }
         return booksDTO;
     }
 

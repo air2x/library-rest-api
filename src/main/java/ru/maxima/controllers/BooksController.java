@@ -11,8 +11,13 @@ import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
 import ru.maxima.services.BooksService;
+import ru.maxima.util.BookErrorResponse;
+import ru.maxima.util.Exeptions.BookNotFoundException;
+import ru.maxima.util.Exeptions.PersonNotFoundException;
+import ru.maxima.util.PersonErrorResponse;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -88,5 +93,11 @@ public class BooksController {
     public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id) {
         booksService.deleteBook(id);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<BookErrorResponse> handleException(BookNotFoundException ex) {
+        BookErrorResponse response = new BookErrorResponse("Book wasn't found", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
