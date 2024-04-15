@@ -40,13 +40,13 @@ public class BooksController {
 
     @GetMapping("/{id}/showBook")
     public BookDTO showBook(@PathVariable("id") Long id) {
-        Book book = booksService.findOneBook(id);
+        Book book = booksService.getOneBook(id);
         return mapper.map(book, BookDTO.class);
     }
 
     @GetMapping("/{id}/getOwner")
     public PersonDTO getBookOwner(@PathVariable("id") Long id) {
-        Book book = booksService.findOneBook(id);
+        Book book = booksService.getOneBook(id);
         return mapper.map(book.getOwner(), PersonDTO.class);
     }
 
