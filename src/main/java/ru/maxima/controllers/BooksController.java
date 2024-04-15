@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
+import ru.maxima.repositories.BooksRepository;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
+
 
 import java.util.List;
 
@@ -22,30 +24,44 @@ public class BooksController {
     private final BooksService booksService;
     private final PeopleService peopleService;
     private final ModelMapper mapper;
+    private final BooksRepository booksRepository;
 
     @Autowired
-    public BooksController(BooksService booksService, PeopleService peopleService, ModelMapper mapper) {
+    public BooksController(BooksService booksService, PeopleService peopleService, ModelMapper mapper,
+                           BooksRepository booksRepository) {
         this.booksService = booksService;
         this.peopleService = peopleService;
         this.mapper = mapper;
+        this.booksRepository = booksRepository;
     }
 
-    @GetMapping
+    @GetMapping("/showAllBooks")
     public ResponseEntity<List<BookDTO>> showAllBooks() {
         return ResponseEntity.ok(booksService.findAllBooks());
     }
 
-    @PostMapping("/{id}/assign")
-    public ResponseEntity<HttpStatus> assignABook(@PathVariable("id") Long id,
-                              @RequestBody PersonDTO person) {
-        booksService.assignABook(id, person);
-        return ResponseEntity.ok(HttpStatus.OK);
+    @GetMapping("/showAllFreeBooks")
+    public ResponseEntity<List<BookDTO>> showFreeBooks() {
+        return ResponseEntity.ok(booksService.showFreeBooks());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/showBook")
     public BookDTO showBook(@PathVariable("id") Long id) {
         Book book = booksService.findOneBook(id);
         return mapper.map(book, BookDTO.class);
+    }
+
+    @GetMapping("/{id}/getOwner")
+    public PersonDTO getBookOwner(@PathVariable("id") Long id) {
+        Book book = booksService.findOneBook(id);
+        return mapper.map(book.getOwner(), PersonDTO.class);
+    }
+
+    @PostMapping("/{id}/assign")
+    public ResponseEntity<HttpStatus> assignABook(@PathVariable("id") Long id,
+                                                  @RequestBody PersonDTO person) {
+        booksService.assignABook(id, person);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/freeTheBook")
@@ -54,15 +70,9 @@ public class BooksController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @GetMapping("/new")
-//    public ResponseEntity<HttpStatus> addNewBook(@RequestBody @Valid BookDTO bookDTO) {
-//        booksService.saveBook(bookDTO);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-
-    @PostMapping()
+    @PostMapping("/createBook")
     public ResponseEntity<HttpStatus> createBook(@RequestBody @Valid BookDTO bookDTO,
-                             BindingResult bindingResult) {
+                                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -70,16 +80,10 @@ public class BooksController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @GetMapping("/{id}/edit")
-//    public String editBook(Model model, @PathVariable("id") Long id) {
-//        model.addAttribute("book", booksService.findOneBook(id));
-//        return "view-to-edit-book";
-//    }
-
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/updateBook")
     public ResponseEntity<HttpStatus> updateBook(@RequestBody @Valid BookDTO bookDTO,
-                             BindingResult bindingResult,
-                             @PathVariable("id") Long id) {
+                                                 BindingResult bindingResult,
+                                                 @PathVariable("id") Long id) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
@@ -87,7 +91,7 @@ public class BooksController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/deleteBook")
     public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id) {
         booksService.deleteBook(id);
         return ResponseEntity.ok(HttpStatus.OK);

@@ -21,6 +21,7 @@ public class PersonRegDTO {
     private Integer age;
 
     @Email
+    @NotEmpty
     private String email;
 
     @NotEmpty

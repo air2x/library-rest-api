@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.dto.PersonRegDTO;
+import ru.maxima.model.Book;
 import ru.maxima.model.Person;
 import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
@@ -42,14 +44,14 @@ public class PeopleController {
         return mapper.map(person, PersonDTO.class);
     }
 
+    @PostMapping("/{id}/takeBook")
+    public ResponseEntity<HttpStatus> takeBook(@PathVariable("id") Long id,
+                                               BookDTO bookDTO) {
+        peopleService.takeBook(id, bookDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-//    @GetMapping("/new")
-//    public ResponseEntity<HttpStatus> addNewPerson(@RequestBody PersonRegDTO personRegDTO) {
-//        peopleService.savePerson(personRegDTO);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-    @PostMapping()
+    @PostMapping("/createPerson")
     public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,
                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -59,14 +61,7 @@ public class PeopleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @GetMapping("/{id}/edit")
-//    public ResponseEntity<HttpStatus> editPerson(@PathVariable("id") Long id,
-//                             @RequestBody PersonDTO personDTO) {
-//        peopleService.updatePerson(id, personDTO);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/updatePerson")
     public ResponseEntity<HttpStatus> updatePerson(@RequestBody @Valid PersonDTO personDTO,
                                BindingResult bindingResult,
                                @PathVariable("id") Long id) {
@@ -77,7 +72,7 @@ public class PeopleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/deletePerson")
     public ResponseEntity<HttpStatus> deletePerson(@PathVariable("id") Long id) {
         peopleService.deletePerson(id);
         return new ResponseEntity<>(HttpStatus.OK);

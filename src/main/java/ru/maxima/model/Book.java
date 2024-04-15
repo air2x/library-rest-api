@@ -40,11 +40,9 @@ public class Book {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @NotEmpty
     @Column(name = "removed_at")
     private LocalDateTime removedAt;
 
-    @NotEmpty
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
 

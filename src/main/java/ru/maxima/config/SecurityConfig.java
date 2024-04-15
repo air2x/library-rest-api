@@ -3,14 +3,19 @@ package ru.maxima.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.maxima.services.PersonDetailsService;
+import ru.maxima.util.JWTFilter;
 
 
 @EnableWebSecurity
@@ -19,10 +24,12 @@ import ru.maxima.services.PersonDetailsService;
 public class SecurityConfig {
 
     private final PersonDetailsService personDetailsService;
+    private final JWTFilter jwtFilter;
 
     @Autowired
-    public SecurityConfig(PersonDetailsService personDetailsService) {
+    public SecurityConfig(PersonDetailsService personDetailsService, JWTFilter jwtFilter) {
         this.personDetailsService = personDetailsService;
+        this.jwtFilter = jwtFilter;
     }
 
     protected void configure(AuthenticationManagerBuilder builder) throws Exception {
@@ -57,13 +64,20 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/people", true)
                         .failureUrl("/auth/login?error"))
                 .logout((s) -> s.logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login"));
+                        .logoutSuccessUrl("/auth/login"))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

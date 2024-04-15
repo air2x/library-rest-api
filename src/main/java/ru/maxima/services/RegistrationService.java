@@ -28,7 +28,7 @@ public class RegistrationService {
     public void register(PersonRegDTO personRegDto) {
         Person person = mapper.map(personRegDto, Person.class);
         personRegDto.setPassword(passwordEncoder.encode(personRegDto.getPassword()));
-        personRegDto.setRole(Role.ROLE_USER);
+        personRegDto.setRole(Role.ADMIN);
         peopleService.savePerson(personRegDto);
     }
 }
