@@ -5,17 +5,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.dto.PersonRegDTO;
-import ru.maxima.model.Book;
 import ru.maxima.model.Person;
-import ru.maxima.services.BooksService;
 import ru.maxima.services.PeopleService;
+import ru.maxima.util.Exeptions.PersonNotFoundException;
+import ru.maxima.util.PersonErrorResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,23 +23,21 @@ import java.util.List;
 public class PeopleController {
 
     private final PeopleService peopleService;
-    private final BooksService booksService;
     private final ModelMapper mapper;
 
     @Autowired
-    public PeopleController(PeopleService peopleService, BooksService booksService, ModelMapper mapper) {
+    public PeopleController(PeopleService peopleService, ModelMapper mapper) {
         this.peopleService = peopleService;
-        this.booksService = booksService;
         this.mapper = mapper;
     }
 
-    @GetMapping
+    @GetMapping("/showAllPeople")
     public ResponseEntity<List<PersonDTO>> showAllPeople() {
         return ResponseEntity.ok(peopleService.findAllPeople());
     }
 
-    @GetMapping("/{id}")
-    public PersonDTO showPerson(@PathVariable("id") Long id) {
+    @GetMapping("/{id}/showPerson")
+    public PersonDTO getPerson(@PathVariable("id") Long id) {
         Person person = peopleService.findOnePerson(id);
         return mapper.map(person, PersonDTO.class);
     }
@@ -76,5 +74,11 @@ public class PeopleController {
     public ResponseEntity<HttpStatus> deletePerson(@PathVariable("id") Long id) {
         peopleService.deletePerson(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handleException(PersonNotFoundException ex) {
+        PersonErrorResponse response = new PersonErrorResponse("Person wasn't found", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

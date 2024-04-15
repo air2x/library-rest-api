@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
-import ru.maxima.repositories.BooksRepository;
 import ru.maxima.services.BooksService;
-import ru.maxima.services.PeopleService;
 
 
 import java.util.List;
@@ -22,22 +20,17 @@ import java.util.List;
 public class BooksController {
 
     private final BooksService booksService;
-    private final PeopleService peopleService;
     private final ModelMapper mapper;
-    private final BooksRepository booksRepository;
 
     @Autowired
-    public BooksController(BooksService booksService, PeopleService peopleService, ModelMapper mapper,
-                           BooksRepository booksRepository) {
+    public BooksController(BooksService booksService, ModelMapper mapper) {
         this.booksService = booksService;
-        this.peopleService = peopleService;
         this.mapper = mapper;
-        this.booksRepository = booksRepository;
     }
 
     @GetMapping("/showAllBooks")
     public ResponseEntity<List<BookDTO>> showAllBooks() {
-        return ResponseEntity.ok(booksService.findAllBooks());
+        return ResponseEntity.ok(booksService.getAllBooks());
     }
 
     @GetMapping("/showAllFreeBooks")

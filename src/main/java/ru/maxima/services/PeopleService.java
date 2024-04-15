@@ -10,6 +10,7 @@ import ru.maxima.dto.PersonDTO;
 import ru.maxima.dto.PersonRegDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.PeopleRepository;
+import ru.maxima.util.Exeptions.PersonNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class PeopleService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
     public Person findOnePerson(Long id) {
         Optional<Person> foundPerson = peopleRepository.findById(id);
-        return foundPerson.orElse(null);
+        return foundPerson.orElseThrow(PersonNotFoundException::new);
     }
 
     @Transactional

@@ -11,7 +11,6 @@ import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class BooksService {
         this.mapper = mapper;
     }
 
-    public List<BookDTO> findAllBooks() {
+    public List<BookDTO> getAllBooks() {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
         for (Book book : books) {
@@ -45,7 +44,7 @@ public class BooksService {
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
-    public Book findOneBook(Long id) {
+    public Book getOneBook(Long id) {
         return booksRepository.findById(id).orElseThrow(null);
     }
 
@@ -61,7 +60,7 @@ public class BooksService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
     @Transactional
     public void updateBook(Long id, BookDTO updateBook) {
-        Book book = findOneBook(id);
+        Book book = getOneBook(id);
         book.setName(updateBook.getName());
         book.setAnnotation(updateBook.getAnnotation());
         book.setYearOfProduction(updateBook.getYearOfProduction());
@@ -73,7 +72,7 @@ public class BooksService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
     @Transactional
     public void deleteBook(Long id) {
-        Book book = findOneBook(id);
+        Book book = getOneBook(id);
         book.setRemovedAt(LocalDateTime.now());
 //        book.setRemovedPerson();
     }
