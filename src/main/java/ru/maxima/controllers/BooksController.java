@@ -13,8 +13,6 @@ import ru.maxima.model.Book;
 import ru.maxima.services.BooksService;
 import ru.maxima.util.BookErrorResponse;
 import ru.maxima.util.Exeptions.BookNotFoundException;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
-import ru.maxima.util.PersonErrorResponse;
 
 
 import java.time.LocalDateTime;
