@@ -38,7 +38,7 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.person.getRemovedAt() == null;
     }
 
     @Override
@@ -49,9 +49,5 @@ public class PersonDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public Person getPerson() {
-        return person;
     }
 }

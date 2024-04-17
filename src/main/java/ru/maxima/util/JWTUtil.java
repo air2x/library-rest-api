@@ -23,7 +23,7 @@ public class JWTUtil {
         Date expireDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
 
         return JWT.create()
-                .withSubject("User details")
+                .withSubject("User")
                 .withClaim("email", email)
                 .withIssuedAt(new Date())
                 .withIssuer("Maxima_School")

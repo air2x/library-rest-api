@@ -6,28 +6,28 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.maxima.model.Person;
-import ru.maxima.repositories.PeopleRepository;
 import ru.maxima.security.PersonDetails;
-
-import java.util.Optional;
+import ru.maxima.util.Exeptions.PersonNotFoundException;
 
 @Service
 public class PersonDetailsService implements UserDetailsService {
 
-    private final PeopleRepository peopleRepository;
+    private final PeopleService peopleService;
 
     @Autowired
-    public PersonDetailsService(PeopleRepository peopleRepository) {
-        this.peopleRepository = peopleRepository;
+    public PersonDetailsService(PeopleService peopleService) {
+        this.peopleService = peopleService;
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Person> person = peopleRepository.findByEmail(email);
-
-        if (person.isEmpty()) {
-            throw new UsernameNotFoundException("User email not found");
+        Person person = null;
+        try {
+            person = peopleService.findByEmail(email);
+        } catch (PersonNotFoundException e) {
+            throw new PersonNotFoundException();
         }
-        return new PersonDetails(person.get());
+        return new PersonDetails(person);
     }
 }

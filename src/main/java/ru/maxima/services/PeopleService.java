@@ -3,6 +3,7 @@ package ru.maxima.services;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maxima.dto.BookDTO;
@@ -24,12 +25,14 @@ public class PeopleService {
     private final PeopleRepository peopleRepository;
     private final ModelMapper mapper;
     private final BooksService booksService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper, BooksService booksService) {
+    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper, BooksService booksService, PasswordEncoder passwordEncoder) {
         this.peopleRepository = peopleRepository;
         this.mapper = mapper;
         this.booksService = booksService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
@@ -48,6 +51,11 @@ public class PeopleService {
     @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
     public Person findOnePerson(Long id) {
         Optional<Person> foundPerson = peopleRepository.findById(id);
+        return foundPerson.orElseThrow(PersonNotFoundException::new);
+    }
+
+    public Person findByEmail(String email) {
+        Optional<Person> foundPerson = peopleRepository.findByEmail(email);
         return foundPerson.orElseThrow(PersonNotFoundException::new);
     }
 
