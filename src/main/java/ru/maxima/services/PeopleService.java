@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
-import ru.maxima.dto.PersonRegDTO;
 import ru.maxima.model.*;
+import ru.maxima.model.enums.Role;
 import ru.maxima.repositories.PeopleRepository;
 import ru.maxima.util.Exeptions.PersonNotFoundException;
 
@@ -25,17 +25,16 @@ public class PeopleService {
     private final PeopleRepository peopleRepository;
     private final ModelMapper mapper;
     private final BooksService booksService;
-    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper, BooksService booksService, PasswordEncoder passwordEncoder) {
+    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper, BooksService booksService) {
         this.peopleRepository = peopleRepository;
         this.mapper = mapper;
         this.booksService = booksService;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     public List<PersonDTO> findAllPeople() {
         List<Person> people = peopleRepository.findAll();
         List<PersonDTO> peopleDTO = new ArrayList<>();
@@ -48,9 +47,14 @@ public class PeopleService {
         return peopleDTO;
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     public Person findOnePerson(Long id) {
         Optional<Person> foundPerson = peopleRepository.findById(id);
+        return foundPerson.orElseThrow(PersonNotFoundException::new);
+    }
+
+    public Person findByName(String name) {
+        Optional<Person> foundPerson = peopleRepository.findByName(name);
         return foundPerson.orElseThrow(PersonNotFoundException::new);
     }
 
@@ -60,14 +64,15 @@ public class PeopleService {
     }
 
     @Transactional
-    public void savePerson(PersonRegDTO personRegDTO) {
-        Person person = mapper.map(personRegDTO, Person.class);
+    public void savePerson(Person person) {
+//        Person person = mapper.map(person, Person.class);
 //        person.setCreatedPerson();
         person.setCreatedAt(LocalDateTime.now());
+        person.setRole(Role.ROLE_USER);
         peopleRepository.save(person);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void updatePerson(Long id, PersonDTO updatePerson) {
         Person person = findOnePerson(id);
@@ -77,7 +82,7 @@ public class PeopleService {
         peopleRepository.save(person);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     @Transactional
     public void deletePerson(Long id) {
         Person person = findOnePerson(id);

@@ -52,10 +52,11 @@ public class PeopleController {
     @PostMapping("/createPerson")
     public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,
                                BindingResult bindingResult) {
+        Person person = mapper.map(personRegDTO, Person.class);
         if (bindingResult.hasErrors()) {
             throw new RuntimeException("Error create person");
         }
-        peopleService.savePerson(personRegDTO);
+        peopleService.savePerson(person);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -7,6 +7,7 @@ import ru.maxima.model.Person;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class PersonDetails implements UserDetails {
 
@@ -18,17 +19,17 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole().toString()));
+        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole().getName()));
     }
 
     @Override
     public String getPassword() {
-        return person.getPassword();
+        return this.person.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return person.getEmail();
+        return this.person.getName();
     }
 
     @Override
@@ -49,5 +50,9 @@ public class PersonDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Person getPerson() {
+        return this.person;
     }
 }

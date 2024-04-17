@@ -18,40 +18,16 @@ import ru.maxima.services.PersonDetailsService;
 import ru.maxima.util.JWTFilter;
 
 
-@EnableWebSecurity
+//@EnableWebSecurity
 @Configuration
-//@EnableMethodSecurity
 public class SecurityConfig {
 
-    private final PersonDetailsService personDetailsService;
     private final JWTFilter jwtFilter;
 
     @Autowired
-    public SecurityConfig(PersonDetailsService personDetailsService, JWTFilter jwtFilter) {
-        this.personDetailsService = personDetailsService;
+    public SecurityConfig(JWTFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
-
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.userDetailsService(personDetailsService)
-                .passwordEncoder(getPasswordEncoder());
-    }
-
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests((s) ->
-//                        s.requestMatchers("/books", "/auth/login", "/auth/registration", "/error").permitAll()
-//                                .anyRequest().authenticated()
-//                                .requestMatchers("/auth/admin").hasRole("ADMIN"))
-//                .formLogin((s) -> s.loginPage("/auth/login")
-//                        .loginProcessingUrl("/process_login")
-//                        .defaultSuccessUrl("/books", true)
-//                        .failureUrl("/auth/login?error"))
-//                .logout((logout) -> logout.logoutSuccessUrl("/auth/login"));
-//        return http.build();
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

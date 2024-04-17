@@ -1,6 +1,5 @@
 package ru.maxima.util;
 
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -23,10 +22,10 @@ public class JWTUtil {
         Date expireDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
 
         return JWT.create()
-                .withSubject("User")
+                .withSubject("User details")
                 .withClaim("email", email)
                 .withIssuedAt(new Date())
-                .withIssuer("Maxima_School")
+                .withIssuer("library")
                 .withExpiresAt(expireDate)
                 .sign(Algorithm.HMAC256(secret));
     }
@@ -35,13 +34,10 @@ public class JWTUtil {
 
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject("User details")
-                .withIssuer("Maxima_School")
+                .withIssuer("library")
                 .build();
 
         DecodedJWT decodedJWT = verifier.verify(token);
-
-        return decodedJWT.getClaim("username").asString();
+        return decodedJWT.getClaim("email").asString();
     }
-
-
 }

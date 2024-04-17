@@ -1,6 +1,5 @@
 package ru.maxima.validation;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -29,10 +28,10 @@ public class PersonValidator implements Validator {
         Person p = (Person) target;
 
         try {
-            service.loadUserByUsername(p.getName());
+            service.loadUserByUsername(p.getEmail());
         } catch (PersonNotFoundException e) {
             return;
         }
-        errors.rejectValue("name" , "100" , "User with this nickName existed");
+        errors.rejectValue("email" , "100" , "User with this email existed");
     }
 }

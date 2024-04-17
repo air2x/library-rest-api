@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.maxima.model.Person;
 import ru.maxima.security.PersonDetails;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
 
 @Service
 public class PersonDetailsService implements UserDetailsService {
@@ -21,12 +20,10 @@ public class PersonDetailsService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Person person = null;
-        try {
-            person = peopleService.findByEmail(email);
-        } catch (PersonNotFoundException e) {
-            throw new PersonNotFoundException();
+    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+        Person person = peopleService.findByEmail(name);
+        if (person == null) {
+            throw new UsernameNotFoundException("User not found from PersonDetailsService");
         }
         return new PersonDetails(person);
     }

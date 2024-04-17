@@ -28,16 +28,16 @@ public class AuthController {
     private final JWTUtil jwtUtil;
     private final ModelMapper mapper;
     private final AuthenticationManager authenticationManager;
-    private final PeopleService peopleService;
+
 
     @Autowired
-    public AuthController(PersonValidator personValidator, RegistrationService registrationService, JWTUtil jwtUtil, ModelMapper mapper, AuthenticationManager authenticationManager, PeopleService peopleService) {
+    public AuthController(PersonValidator personValidator, RegistrationService registrationService, JWTUtil jwtUtil,
+                          ModelMapper mapper, AuthenticationManager authenticationManager) {
         this.personValidator = personValidator;
         this.registrationService = registrationService;
         this.jwtUtil = jwtUtil;
         this.mapper = mapper;
         this.authenticationManager = authenticationManager;
-        this.peopleService = peopleService;
     }
 
     @PostMapping("/registration")
@@ -46,10 +46,10 @@ public class AuthController {
         Person person = mapper.map(personRegDTO, Person.class);
         personValidator.validate(person, bindingResult);
         if (bindingResult.hasErrors()) {
-            throw new RuntimeException("Error registration");
+            throw new RuntimeException("Error registration"); // Добавить выброс ошибки
         }
-        peopleService.savePerson(personRegDTO);
-        String token = jwtUtil.generateToken(person.getName());
+        String token = jwtUtil.generateToken(person.getEmail());
+        registrationService.register(person);
         return Map.of("jwt-token", token);
     }
 
