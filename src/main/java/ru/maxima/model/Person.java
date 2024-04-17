@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import ru.maxima.model.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +50,7 @@ public class Person {
     private List<Book> books;
 
     @Column(name = "role")
-    private Role role;
+    private String role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

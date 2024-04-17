@@ -36,7 +36,6 @@ public class Book {
     @JoinColumn(name = "owner", referencedColumnName = "id")
     private Person owner;
 
-    @NotEmpty
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

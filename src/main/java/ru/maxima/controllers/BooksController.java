@@ -5,11 +5,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
+import ru.maxima.security.PersonDetails;
 import ru.maxima.services.BooksService;
 import ru.maxima.util.BookErrorResponse;
 import ru.maxima.util.Exeptions.BookNotFoundException;
@@ -68,28 +70,31 @@ public class BooksController {
 
     @PostMapping("/createBook")
     public ResponseEntity<HttpStatus> createBook(@RequestBody @Valid BookDTO bookDTO,
-                                                 BindingResult bindingResult) {
+                                                 BindingResult bindingResult,
+                                                 @AuthenticationPrincipal PersonDetails personDetails) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        booksService.saveBook(bookDTO);
+        booksService.saveBook(bookDTO, personDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/updateBook")
     public ResponseEntity<HttpStatus> updateBook(@RequestBody @Valid BookDTO bookDTO,
                                                  BindingResult bindingResult,
-                                                 @PathVariable("id") Long id) {
+                                                 @PathVariable("id") Long id,
+                                                 @AuthenticationPrincipal PersonDetails personDetails) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        booksService.updateBook(id, bookDTO);
+        booksService.updateBook(id, bookDTO, personDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/deleteBook")
-    public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id) {
-        booksService.deleteBook(id);
+    public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id,
+                                                 @AuthenticationPrincipal PersonDetails personDetails) {
+        booksService.deleteBook(id,personDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

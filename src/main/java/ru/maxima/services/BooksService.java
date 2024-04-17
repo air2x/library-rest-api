@@ -10,6 +10,8 @@ import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
+import ru.maxima.security.PersonDetails;
+import ru.maxima.util.Exeptions.PersonNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,46 +37,50 @@ public class BooksService {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
         for (Book book : books) {
-            booksDTO.add(mapper.map(book, BookDTO.class));
+            if (book.getRemovedAt() == null) {
+                booksDTO.add(mapper.map(book, BookDTO.class));
+            }
         }
         return booksDTO;
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     public Book getOneBook(Long id) {
         return booksRepository.findById(id).orElseThrow(null);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     @Transactional
-    public void saveBook(BookDTO bookDTO) {
+    public void saveBook(BookDTO bookDTO, PersonDetails personDetails) {
+
         Book book = mapper.map(bookDTO, Book.class);
         book.setCreatedAt(LocalDateTime.now());
-//        book.setCreatedPerson();
+        book.setCreatedPerson(findPersonByEmail(personDetails));
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     @Transactional
-    public void updateBook(Long id, BookDTO updateBook) {
+    public void updateBook(Long id, BookDTO updateBook, PersonDetails personDetails) {
         Book book = getOneBook(id);
         book.setName(updateBook.getName());
         book.setAnnotation(updateBook.getAnnotation());
         book.setYearOfProduction(updateBook.getYearOfProduction());
         book.setUpdatedAt(LocalDateTime.now());
+        book.setUpdatedPerson(findPersonByEmail(personDetails));
 //        book.setOwner(updateBook.getOwner());
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     @Transactional
-    public void deleteBook(Long id) {
+    public void deleteBook(Long id, PersonDetails personDetails) {
         Book book = getOneBook(id);
         book.setRemovedAt(LocalDateTime.now());
-//        book.setRemovedPerson();
+        book.setRemovedPerson(findPersonByEmail(personDetails));
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     @Transactional
     public void assignABook(Long bookId, PersonDTO personDTO) {
         Optional<Person> person = peopleRepository.findByName(personDTO.getEmail());
@@ -87,7 +93,7 @@ public class BooksService {
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
     @Transactional
     public void freeTheBook(Long bookId) {
         Book book = booksRepository.findById(bookId)
@@ -96,7 +102,7 @@ public class BooksService {
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
+//    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     public List<BookDTO> showFreeBooks() {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
@@ -110,5 +116,10 @@ public class BooksService {
 
     public Book findOneBookByName(String name) {
         return booksRepository.findByName(name).orElseThrow(null);
+    }
+
+
+    private Person findPersonByEmail(PersonDetails personDetails) {
+        return peopleRepository.findByEmail(personDetails.getUsername()).orElseThrow(PersonNotFoundException::new);
     }
 }

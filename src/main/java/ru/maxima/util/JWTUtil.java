@@ -3,6 +3,7 @@ package ru.maxima.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,5 +40,10 @@ public class JWTUtil {
 
         DecodedJWT decodedJWT = verifier.verify(token);
         return decodedJWT.getClaim("email").asString();
+    }
+
+    public String extractEmailFromToken(String token) {
+        DecodedJWT jwt = JWT.decode(token);
+        return jwt.getClaims().toString();
     }
 }
