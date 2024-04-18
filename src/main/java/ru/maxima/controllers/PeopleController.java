@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.maxima.dto.BookDTO;
@@ -50,7 +49,7 @@ public class PeopleController {
     }
 
     @GetMapping("/showAboutMe")
-    public PersonDTO getPerson(@AuthenticationPrincipal PersonDetails personDetails) {
+    public PersonDTO getMyPerson(@AuthenticationPrincipal PersonDetails personDetails) {
         Person person = peopleService.getMyPerson(personDetails);
         return mapper.map(person, PersonDTO.class);
     }
@@ -59,7 +58,6 @@ public class PeopleController {
     public List<BookDTO> getMyBooks(@AuthenticationPrincipal PersonDetails personDetails) {
         return peopleService.getMyBooks(personDetails);
     }
-
 
     @PostMapping("/createPerson")
     public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,

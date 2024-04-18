@@ -56,6 +56,7 @@ public class PeopleService {
     }
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
+    @Transactional
     public void savePerson(Person person, PersonDetails userDetails) {
         Person personDetails = findByEmail(userDetails.getUsername());
         person.setCreatedPerson(personDetails);
