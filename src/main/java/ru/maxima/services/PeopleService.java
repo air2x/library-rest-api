@@ -24,14 +24,12 @@ public class PeopleService {
 
     private final PeopleRepository peopleRepository;
     private final ModelMapper mapper;
-    private final BooksService booksService;
 
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper, BooksService booksService) {
+    public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
         this.mapper = mapper;
-        this.booksService = booksService;
     }
 
     public List<PersonDTO> findAllPeople() {
@@ -46,6 +44,7 @@ public class PeopleService {
         return peopleDTO;
     }
 
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     public Person findOnePerson(Long id) {
         Optional<Person> foundPerson = peopleRepository.findById(id);
         return foundPerson.orElseThrow(PersonNotFoundException::new);
@@ -57,7 +56,6 @@ public class PeopleService {
     }
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
-    @Transactional
     public void savePerson(Person person, PersonDetails userDetails) {
         Person personDetails = findByEmail(userDetails.getUsername());
         person.setCreatedPerson(personDetails);
@@ -74,12 +72,15 @@ public class PeopleService {
         person.setRemovedAt(LocalDateTime.now());
     }
 
-    @Transactional
-    public void takeBook(Long personId, BookDTO bookDTO) {
-        Book book = booksService.findOneBookByName(bookDTO.getName());
-        Person person = findOnePerson(personId);
-        List<Book> personBooks = person.getBooks();
-        personBooks.add(book);
-        person.setBooks(personBooks);
+    public Person getMyPerson(PersonDetails personDetails) {
+        return peopleRepository.findByEmail(personDetails.getUsername()).orElseThrow(PersonNotFoundException::new);
+    }
+
+    public List<BookDTO> getMyBooks(PersonDetails personDetails) {
+        Person person = peopleRepository.findByEmail(personDetails.getUsername()).orElseThrow(PersonNotFoundException::new);
+        List<BookDTO> booksDTO = new ArrayList<>();
+        List<Book> books = person.getBooks();
+        books.forEach(book -> booksDTO.add(mapper.map(book, BookDTO.class)));
+        return booksDTO;
     }
 }

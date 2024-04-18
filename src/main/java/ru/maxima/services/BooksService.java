@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.maxima.dto.BookCoverDTO;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
 import ru.maxima.security.PersonDetails;
+import ru.maxima.util.Exeptions.BookNotFoundException;
 import ru.maxima.util.Exeptions.PersonNotFoundException;
 
 import java.time.LocalDateTime;
@@ -82,12 +84,8 @@ public class BooksService {
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void assignABook(Long bookId, PersonDTO personDTO) {
-        Optional<Person> person = peopleRepository.findByName(personDTO.getEmail());
-        Book book = booksRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + bookId));
-//        if (person.isEmpty()) {
-//            peopleService.savePerson(personDTO);
-//        }
+        Optional<Person> person = peopleRepository.findByEmail(personDTO.getEmail());
+        Book book = booksRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         book.setOwner(person.orElseThrow());
         booksRepository.save(book);
     }
@@ -95,13 +93,12 @@ public class BooksService {
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void freeTheBook(Long bookId) {
-        Book book = booksRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + bookId));
+        Book book = booksRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         book.setOwner(null);
         booksRepository.save(book);
     }
 
-    public List<BookDTO> showFreeBooks() {
+    public List<BookDTO> getFreeBooks() {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
         for (Book book : books) {
@@ -112,10 +109,23 @@ public class BooksService {
         return booksDTO;
     }
 
+    public List<BookCoverDTO> getCoverBooks() {
+        List<BookCoverDTO> booksCover = new ArrayList<>();
+        List<BookDTO> books = getFreeBooks();
+        books.forEach(book -> booksCover.add(mapper.map(book, BookCoverDTO.class)));
+        return booksCover;
+    }
+
     public Book findOneBookByName(String name) {
         return booksRepository.findByName(name).orElseThrow(null);
     }
 
+    @Transactional
+    public void takeBook(Long id, PersonDetails personDetails) {
+        Book book = booksRepository.findById(id).orElseThrow(PersonNotFoundException::new);
+        Person person = peopleRepository.findByEmail(personDetails.getUsername()).orElseThrow(BookNotFoundException::new);
+        book.setOwner(person);
+    }
 
     private Person findPersonByEmail(PersonDetails personDetails) {
         return peopleRepository.findByEmail(personDetails.getUsername()).orElseThrow(PersonNotFoundException::new);

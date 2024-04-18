@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.maxima.dto.BookCoverDTO;
 import ru.maxima.dto.BookDTO;
 import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.Book;
@@ -40,7 +41,12 @@ public class BooksController {
 
     @GetMapping("/showAllFreeBooks")
     public ResponseEntity<List<BookDTO>> showFreeBooks() {
-        return ResponseEntity.ok(booksService.showFreeBooks());
+        return ResponseEntity.ok(booksService.getFreeBooks());
+    }
+
+    @GetMapping("/showCoverBooks")
+    public ResponseEntity<List<BookCoverDTO>> showCoverBooks() {
+        return ResponseEntity.ok(booksService.getCoverBooks());
     }
 
     @GetMapping("/{id}/showBook")
@@ -65,6 +71,13 @@ public class BooksController {
     @PostMapping("/{id}/freeTheBook")
     public ResponseEntity<HttpStatus> freeTheBook(@PathVariable("id") Long id) {
         booksService.freeTheBook(id);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/takeBook")
+    public ResponseEntity<HttpStatus> takeBook(@PathVariable("id") Long id,
+                                               @AuthenticationPrincipal PersonDetails personDetails) {
+        booksService.takeBook(id, personDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

@@ -49,6 +49,18 @@ public class PeopleController {
         return mapper.map(person, PersonDTO.class);
     }
 
+    @GetMapping("/showAboutMe")
+    public PersonDTO getPerson(@AuthenticationPrincipal PersonDetails personDetails) {
+        Person person = peopleService.getMyPerson(personDetails);
+        return mapper.map(person, PersonDTO.class);
+    }
+
+    @GetMapping("/showMyBooks")
+    public List<BookDTO> getMyBooks(@AuthenticationPrincipal PersonDetails personDetails) {
+        return peopleService.getMyBooks(personDetails);
+    }
+
+
     @PostMapping("/createPerson")
     public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,
                                                    BindingResult bindingResult,
