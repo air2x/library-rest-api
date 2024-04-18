@@ -86,7 +86,6 @@ public class BooksService {
         Optional<Person> person = peopleRepository.findByEmail(personDTO.getEmail());
         Book book = booksRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         book.setOwner(person.orElseThrow());
-        booksRepository.save(book);
     }
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
@@ -94,7 +93,6 @@ public class BooksService {
     public void freeTheBook(Long bookId) {
         Book book = booksRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
         book.setOwner(null);
-        booksRepository.save(book);
     }
 
     public List<BookDTO> getFreeBooks() {
