@@ -23,7 +23,7 @@ public class RegistrationService {
 
     public void register(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
-        person.setRole(Role.ROLE_ADMIN.getName());
+        person.setRole(Role.ADMIN.getName());
         person.setCreatedAt(LocalDateTime.now());
         person.setCreatedPerson(person);
         peopleRepository.save(person);

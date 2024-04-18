@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import ru.maxima.model.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.List;

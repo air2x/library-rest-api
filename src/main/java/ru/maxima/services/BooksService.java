@@ -44,22 +44,21 @@ public class BooksService {
         return booksDTO;
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     public Book getOneBook(Long id) {
         return booksRepository.findById(id).orElseThrow(null);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void saveBook(BookDTO bookDTO, PersonDetails personDetails) {
-
         Book book = mapper.map(bookDTO, Book.class);
         book.setCreatedAt(LocalDateTime.now());
         book.setCreatedPerson(findPersonByEmail(personDetails));
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void updateBook(Long id, BookDTO updateBook, PersonDetails personDetails) {
         Book book = getOneBook(id);
@@ -72,7 +71,7 @@ public class BooksService {
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void deleteBook(Long id, PersonDetails personDetails) {
         Book book = getOneBook(id);
@@ -80,7 +79,7 @@ public class BooksService {
         book.setRemovedPerson(findPersonByEmail(personDetails));
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void assignABook(Long bookId, PersonDTO personDTO) {
         Optional<Person> person = peopleRepository.findByName(personDTO.getEmail());
@@ -93,7 +92,7 @@ public class BooksService {
         booksRepository.save(book);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void freeTheBook(Long bookId) {
         Book book = booksRepository.findById(bookId)
@@ -102,7 +101,6 @@ public class BooksService {
         booksRepository.save(book);
     }
 
-//    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN)")
     public List<BookDTO> showFreeBooks() {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();

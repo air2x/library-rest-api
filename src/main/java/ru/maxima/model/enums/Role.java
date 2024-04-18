@@ -1,8 +1,8 @@
 package ru.maxima.model.enums;
 
 public enum Role {
-    ROLE_ADMIN("ADMIN"),
-    ROLE_USER("USER");
+    ADMIN("ADMIN"),
+    USER("USER");
 
     private final String name;
 

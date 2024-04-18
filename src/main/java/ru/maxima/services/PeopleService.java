@@ -61,13 +61,15 @@ public class PeopleService {
         return foundPerson.orElseThrow(PersonNotFoundException::new);
     }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    //    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ADMIN.name())")
+    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void savePerson(Person person, PersonDetails userDetails) {
         Person personDetails = findByEmail(userDetails.getUsername());
         person.setCreatedPerson(personDetails);
         person.setCreatedAt(LocalDateTime.now());
-        person.setRole(Role.ROLE_USER.getName());
+        person.setRole(Role.USER.getName());
         peopleRepository.save(person);
     }
 
@@ -81,7 +83,7 @@ public class PeopleService {
 ////        peopleRepository.save(person);
 //    }
 
-    @PreAuthorize("hasRole(T(ru.maxima.model.enums.Role).ROLE_ADMIN.getName())")
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void deletePerson(Long id, PersonDetails personDetails) {
         Person person = findOnePerson(id);
