@@ -69,7 +69,6 @@ public class BooksService {
         book.setYearOfProduction(updateBook.getYearOfProduction());
         book.setUpdatedAt(LocalDateTime.now());
         book.setUpdatedPerson(findPersonByEmail(personDetails));
-//        book.setOwner(updateBook.getOwner());
         booksRepository.save(book);
     }
 
@@ -102,7 +101,7 @@ public class BooksService {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
         for (Book book : books) {
-            if (book.getOwner() == null) {
+            if (book.getOwner() == null && book.getRemovedAt() == null) {
                 booksDTO.add(mapper.map(book, BookDTO.class));
             }
         }
@@ -114,10 +113,6 @@ public class BooksService {
         List<BookDTO> books = getFreeBooks();
         books.forEach(book -> booksCover.add(mapper.map(book, BookCoverDTO.class)));
         return booksCover;
-    }
-
-    public Book findOneBookByName(String name) {
-        return booksRepository.findByName(name).orElseThrow(null);
     }
 
     @Transactional
