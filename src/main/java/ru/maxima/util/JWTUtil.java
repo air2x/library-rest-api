@@ -41,9 +41,4 @@ public class JWTUtil {
         DecodedJWT decodedJWT = verifier.verify(token);
         return decodedJWT.getClaim("email").asString();
     }
-
-    public String extractEmailFromToken(String token) {
-        DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaims().toString();
-    }
 }

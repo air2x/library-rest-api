@@ -94,7 +94,7 @@ public class BooksController {
     @DeleteMapping("/{id}/deleteBook")
     public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id,
                                                  @AuthenticationPrincipal PersonDetails personDetails) {
-        booksService.deleteBook(id,personDetails);
+        booksService.deleteBook(id, personDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

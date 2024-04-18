@@ -21,6 +21,7 @@ public class PersonRegDTO {
     private Integer age;
 
     @Email
+    @NotEmpty
     private String email;
 
     @NotEmpty
@@ -28,5 +29,4 @@ public class PersonRegDTO {
 
     @NotEmpty
     private String password;
-//    private Role role;
 }

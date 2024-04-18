@@ -32,6 +32,6 @@ public class PersonValidator implements Validator {
         } catch (PersonNotFoundException e) {
             return;
         }
-        errors.rejectValue("email" , "100" , "User with this email existed");
+        errors.rejectValue("email", "100", "User with this email existed");
     }
 }

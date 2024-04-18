@@ -49,13 +49,6 @@ public class PeopleController {
         return mapper.map(person, PersonDTO.class);
     }
 
-//    @PostMapping("/{id}/takeBook")
-//    public ResponseEntity<HttpStatus> takeBook(@PathVariable("id") Long id,
-//                                               BookDTO bookDTO) {
-//        peopleService.takeBook(id, bookDTO);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
     @PostMapping("/createPerson")
     public ResponseEntity<HttpStatus> createPerson(@RequestBody @Valid PersonRegDTO personRegDTO,
                                                    BindingResult bindingResult,
@@ -68,17 +61,6 @@ public class PeopleController {
         peopleService.savePerson(person, userDetails);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-//    @PostMapping("/{id}/updatePerson")
-//    public ResponseEntity<HttpStatus> updatePerson(@RequestBody @Valid PersonDTO personDTO,
-//                                                   BindingResult bindingResult,
-//                                                   @PathVariable("id") Long id) {
-//        if (bindingResult.hasErrors()) {
-//            throw new RuntimeException("Error update person");
-//        }
-//        peopleService.updatePerson(id, personDTO);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
 
     @DeleteMapping("/{id}/deletePerson")
     public ResponseEntity<HttpStatus> deletePerson(@PathVariable("id") Long id,

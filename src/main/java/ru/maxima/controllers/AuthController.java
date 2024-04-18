@@ -54,19 +54,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String , Object> login(@RequestBody PersonLoginDTO personLoginDTO){
+    public Map<String, Object> login(@RequestBody PersonLoginDTO personLoginDTO) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(personLoginDTO.getEmail() , personLoginDTO.getPassword());
+                new UsernamePasswordAuthenticationToken(personLoginDTO.getEmail(), personLoginDTO.getPassword());
 
         try {
             authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         } catch (AuthenticationException e) {
-            return Map.of("message" , "500");
+            return Map.of("message", "500");
         }
-//        Person personToken = peopleService.findByEmail(personLoginDTO.getEmail());
 
         String token = jwtUtil.generateToken(personLoginDTO.getEmail());
-
         return Map.of("jwt - token", token);
     }
 }
