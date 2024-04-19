@@ -18,7 +18,6 @@ public class PersonDetailsService implements UserDetailsService {
         this.peopleService = peopleService;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         Person person = peopleService.findByEmail(name);

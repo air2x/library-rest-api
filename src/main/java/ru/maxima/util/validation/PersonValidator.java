@@ -1,4 +1,4 @@
-package ru.maxima.validation;
+package ru.maxima.util.validation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.maxima.model.Person;
 import ru.maxima.services.PersonDetailsService;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
+import ru.maxima.util.exeptions.PersonNotFoundException;
 
 @Component
 public class PersonValidator implements Validator {

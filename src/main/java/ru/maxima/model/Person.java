@@ -34,7 +34,7 @@ public class Person {
     private Integer age;
 
     @Email
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @NotEmpty

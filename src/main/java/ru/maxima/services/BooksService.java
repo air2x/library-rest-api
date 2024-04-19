@@ -7,18 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maxima.dto.BookCoverDTO;
 import ru.maxima.dto.BookDTO;
-import ru.maxima.dto.PersonDTO;
 import ru.maxima.model.*;
 import ru.maxima.repositories.BooksRepository;
 import ru.maxima.repositories.PeopleRepository;
 import ru.maxima.security.PersonDetails;
-import ru.maxima.util.Exeptions.BookNotFoundException;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
+import ru.maxima.util.exeptions.BookNotFoundException;
+import ru.maxima.util.exeptions.PersonNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,6 +33,7 @@ public class BooksService {
         this.mapper = mapper;
     }
 
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     public List<BookDTO> getAllBooks() {
         List<Book> books = booksRepository.findAll();
         List<BookDTO> booksDTO = new ArrayList<>();
@@ -48,7 +47,7 @@ public class BooksService {
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     public Book getOneBook(Long id) {
-        return booksRepository.findById(id).orElseThrow(null);
+        return booksRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
@@ -82,10 +81,10 @@ public class BooksService {
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
-    public void assignABook(Long bookId, PersonDTO personDTO) {
-        Optional<Person> person = peopleRepository.findByEmail(personDTO.getEmail());
+    public void assignABook(Long bookId, String email) {
+        Person person = peopleRepository.findByEmail(email).orElseThrow(PersonNotFoundException::new);
         Book book = booksRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
-        book.setOwner(person.orElseThrow());
+        book.setOwner(person);
     }
 
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")

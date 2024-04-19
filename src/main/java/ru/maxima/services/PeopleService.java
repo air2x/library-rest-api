@@ -11,7 +11,8 @@ import ru.maxima.model.*;
 import ru.maxima.model.enums.Role;
 import ru.maxima.repositories.PeopleRepository;
 import ru.maxima.security.PersonDetails;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
+import ru.maxima.util.exeptions.PersonExistsException;
+import ru.maxima.util.exeptions.PersonNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,13 +26,13 @@ public class PeopleService {
     private final PeopleRepository peopleRepository;
     private final ModelMapper mapper;
 
-
     @Autowired
     public PeopleService(PeopleRepository peopleRepository, ModelMapper mapper) {
         this.peopleRepository = peopleRepository;
         this.mapper = mapper;
     }
 
+    @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     public List<PersonDTO> findAllPeople() {
         List<Person> people = peopleRepository.findAll();
         List<PersonDTO> peopleDTO = new ArrayList<>();
@@ -58,6 +59,10 @@ public class PeopleService {
     @PreAuthorize("hasAuthority(T(ru.maxima.model.enums.Role).ADMIN.getName())")
     @Transactional
     public void savePerson(Person person, PersonDetails userDetails) {
+        Person person1 = findByEmail(person.getEmail());
+        if (person1 != null) {
+            throw new PersonExistsException();
+        }
         Person personDetails = findByEmail(userDetails.getUsername());
         person.setCreatedPerson(personDetails);
         person.setCreatedAt(LocalDateTime.now());

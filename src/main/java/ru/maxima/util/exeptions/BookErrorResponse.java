@@ -1,4 +1,4 @@
-package ru.maxima.util;
+package ru.maxima.util.exeptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

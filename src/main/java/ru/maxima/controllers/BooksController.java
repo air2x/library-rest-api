@@ -8,14 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.maxima.dto.BookCoverDTO;
-import ru.maxima.dto.BookDTO;
-import ru.maxima.dto.PersonDTO;
+import ru.maxima.dto.*;
 import ru.maxima.model.Book;
+import ru.maxima.model.Person;
+import ru.maxima.model.enums.Role;
 import ru.maxima.security.PersonDetails;
 import ru.maxima.services.BooksService;
-import ru.maxima.util.BookErrorResponse;
-import ru.maxima.util.Exeptions.BookNotFoundException;
+import ru.maxima.services.PeopleService;
+import ru.maxima.util.exeptions.BookBusyException;
+import ru.maxima.util.exeptions.BookErrorResponse;
+import ru.maxima.util.exeptions.BookNotFoundException;
 
 
 import java.time.LocalDateTime;
@@ -26,11 +28,13 @@ import java.util.List;
 public class BooksController {
 
     private final BooksService booksService;
+    private final PeopleService peopleService;
     private final ModelMapper mapper;
 
     @Autowired
-    public BooksController(BooksService booksService, ModelMapper mapper) {
+    public BooksController(BooksService booksService, PeopleService peopleService, ModelMapper mapper) {
         this.booksService = booksService;
+        this.peopleService = peopleService;
         this.mapper = mapper;
     }
 
@@ -50,9 +54,16 @@ public class BooksController {
     }
 
     @GetMapping("/{id}/showBook")
-    public BookDTO showBook(@PathVariable("id") Long id) {
+    public BookResponseDTO showBook(@PathVariable("id") Long id,
+                                    @AuthenticationPrincipal PersonDetails personDetails) {
+        Person person = peopleService.findByEmail(personDetails.getUsername());
+        if (person.getRole().equals(Role.USER.getName())) {
+            throw new BookBusyException();
+        }
         Book book = booksService.getOneBook(id);
-        return mapper.map(book, BookDTO.class);
+        BookResponseDTO bookResponseDTO = mapper.map(book, BookResponseDTO.class);
+        bookResponseDTO.setOwner(mapper.map(book.getOwner(), PersonDTO.class));
+        return bookResponseDTO;
     }
 
     @GetMapping("/{id}/getOwner")
@@ -63,8 +74,8 @@ public class BooksController {
 
     @PostMapping("/{id}/assign")
     public ResponseEntity<HttpStatus> assignABook(@PathVariable("id") Long id,
-                                                  @RequestBody PersonDTO person) {
-        booksService.assignABook(id, person);
+                                                  @RequestBody PersonEmailDTO personEmailDTO) {
+        booksService.assignABook(id, personEmailDTO.getEmail());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -114,6 +125,12 @@ public class BooksController {
     @ExceptionHandler
     private ResponseEntity<BookErrorResponse> handleException(BookNotFoundException ex) {
         BookErrorResponse response = new BookErrorResponse("Book wasn't found", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<BookErrorResponse> handleException(BookBusyException ex) {
+        BookErrorResponse response = new BookErrorResponse("This book busy", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

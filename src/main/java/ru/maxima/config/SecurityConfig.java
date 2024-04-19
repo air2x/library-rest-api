@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.maxima.util.JWTFilter;
+import ru.maxima.util.jwt.JWTFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

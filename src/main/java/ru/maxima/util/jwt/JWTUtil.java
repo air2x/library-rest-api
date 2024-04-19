@@ -1,4 +1,4 @@
-package ru.maxima.util;
+package ru.maxima.util.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

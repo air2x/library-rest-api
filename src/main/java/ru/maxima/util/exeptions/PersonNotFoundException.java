@@ -1,4 +1,4 @@
-package ru.maxima.util.Exeptions;
+package ru.maxima.util.exeptions;
 
 public class PersonNotFoundException extends RuntimeException {
 

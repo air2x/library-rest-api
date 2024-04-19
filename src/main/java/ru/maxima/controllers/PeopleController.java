@@ -15,8 +15,9 @@ import ru.maxima.model.Person;
 import ru.maxima.security.PersonDetails;
 import ru.maxima.services.PasswordEncodeService;
 import ru.maxima.services.PeopleService;
-import ru.maxima.util.Exeptions.PersonNotFoundException;
-import ru.maxima.util.PersonErrorResponse;
+import ru.maxima.util.exeptions.PersonExistsException;
+import ru.maxima.util.exeptions.PersonNotFoundException;
+import ru.maxima.util.exeptions.PersonErrorResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,5 +84,11 @@ public class PeopleController {
     private ResponseEntity<PersonErrorResponse> handleException(PersonNotFoundException ex) {
         PersonErrorResponse response = new PersonErrorResponse("Person wasn't found", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handleException(PersonExistsException ex) {
+        PersonErrorResponse response = new PersonErrorResponse("Person with this email exists", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }
